@@ -1,0 +1,473 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinical-harness.local/schemas/v1/focal_run.schema.json",
+  "title": "Symmetric T/M focal run with immutable evidence output",
+  "x-definition-ids": [
+    "CONTRACT-08-KTM",
+    "CONTRACT-09-FOCAL",
+    "CONTRACT-10-EVIDENCE"
+  ],
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "condition",
+    "ordered_window_ids",
+    "control_manifest",
+    "prompt_sha256",
+    "runtime",
+    "raw_response",
+    "raw_response_sha256",
+    "moments",
+    "session_duration_seconds"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "condition": {
+      "enum": [
+        "T",
+        "M"
+      ]
+    },
+    "ordered_window_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "control_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt_template_sha256",
+        "output_schema_sha256",
+        "runtime_sha256",
+        "temperature",
+        "json_mode",
+        "request_order",
+        "declared_request_order",
+        "warmup_discarded"
+      ],
+      "properties": {
+        "prompt_template_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "output_schema_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "runtime_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "temperature": {
+          "const": 0
+        },
+        "json_mode": {
+          "const": true
+        },
+        "request_order": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "T",
+              "M"
+            ]
+          }
+        },
+        "declared_request_order": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "T",
+              "M"
+            ]
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "warmup_discarded": {
+          "const": true
+        }
+      }
+    },
+    "prompt_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "runtime": {
+      "$ref": "#/$defs/runtime"
+    },
+    "raw_response": {
+      "type": "string"
+    },
+    "raw_response_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "moments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/moment"
+      }
+    },
+    "session_duration_seconds": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "model_id",
+        "model_revision",
+        "model_checksum",
+        "tokenizer_revision",
+        "backend_name",
+        "backend_version",
+        "container_id",
+        "cuda_gpu",
+        "dtype_quantization",
+        "context_length",
+        "chat_template_id",
+        "json_parameters",
+        "maximum_output_tokens",
+        "stop_sequences",
+        "seed",
+        "batching",
+        "request_order",
+        "timeout_seconds",
+        "retry_policy",
+        "temperature",
+        "json_mode"
+      ],
+      "properties": {
+        "profile_id": {
+          "type": "string"
+        },
+        "model_id": {
+          "type": "string"
+        },
+        "model_revision": {
+          "type": "string"
+        },
+        "model_checksum": {
+          "$ref": "#/$defs/sha256"
+        },
+        "tokenizer_revision": {
+          "type": "string"
+        },
+        "backend_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "backend_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "container_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "cuda_gpu": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "dtype_quantization": {
+          "type": "string"
+        },
+        "context_length": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "chat_template_id": {
+          "type": "string"
+        },
+        "json_parameters": {
+          "type": "object"
+        },
+        "maximum_output_tokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "stop_sequences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "seed": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "batching": {
+          "type": "string"
+        },
+        "request_order": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "T",
+              "M"
+            ]
+          }
+        },
+        "timeout_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "retry_policy": {
+          "type": "string"
+        },
+        "temperature": {
+          "const": 0
+        },
+        "json_mode": {
+          "const": true
+        }
+      }
+    },
+    "moment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moment_id",
+        "start_seconds",
+        "end_seconds",
+        "description",
+        "clinical_significance",
+        "category",
+        "evidence_ids",
+        "cross_modal_observations",
+        "resolved_evidence",
+        "invalid_evidence_ids",
+        "citations_valid"
+      ],
+      "properties": {
+        "moment_id": {
+          "type": "string"
+        },
+        "start_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clinical_significance": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cross_modal_observations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resolved_evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resolved_evidence"
+          }
+        },
+        "invalid_evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "citations_valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "resolved_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_id",
+        "session_id",
+        "modality",
+        "window_id",
+        "source_window_start_seconds",
+        "source_window_end_seconds",
+        "start_seconds",
+        "end_seconds",
+        "interval_basis",
+        "camera_id",
+        "track_id",
+        "camera_ids",
+        "person_ids",
+        "source_artifact_sha256",
+        "value"
+      ],
+      "properties": {
+        "evidence_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modality": {
+          "enum": [
+            "transcript",
+            "speaker_dynamics",
+            "visual_scene",
+            "visual_attention",
+            "modality_coverage"
+          ]
+        },
+        "window_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_window_start_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "source_window_end_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "start_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "interval_basis": {
+          "enum": [
+            "item_interval",
+            "item_point",
+            "source_window"
+          ]
+        },
+        "camera_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "track_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "camera_ids": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "person_ids": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_artifact_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "value": {
+          "type": "object"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "modality": {
+                "const": "visual_scene"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "camera_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "modality": {
+                "const": "visual_attention"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "camera_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "track_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

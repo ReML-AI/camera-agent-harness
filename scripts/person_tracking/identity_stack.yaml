@@ -1,0 +1,26 @@
+schema_version: identity-stack-config/1.0
+
+# UNVALIDATED DEFAULTS PENDING CALIBRATION against identity ground truth.
+# These values are configuration for a future calibration run; they are not
+# empirical claims and must not be described as validated in reports.
+detection:
+  confidence_threshold: 0.35
+  iou_threshold: 0.50
+  minimum_box_area_fraction: 0.003
+  minimum_height_width_ratio: 0.80
+  maximum_height_width_ratio: 6.00
+
+embedding:
+  input_height: 256
+  input_width: 128
+  maximum_crops_per_tracklet: 5
+  minimum_crop_width_pixels: 8
+  minimum_crop_height_pixels: 16
+
+within_camera:
+  similarity_threshold: 0.80
+  maximum_gap_seconds: 15.0
+
+cross_camera:
+  similarity_threshold: 0.75
+  minimum_copresence_seconds: 0.0

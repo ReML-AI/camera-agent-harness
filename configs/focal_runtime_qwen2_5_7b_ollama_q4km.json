@@ -1,0 +1,32 @@
+{
+  "profile_id": "focal-qwen25-7b-ollama-q4km-v1.0.0",
+  "model_id": "qwen2.5:7b",
+  "model_revision": "ollama-config-sha256:2f15b3218f0552c60647ce60ada83632d2c09755b16259b13e3e4458e9ae419d",
+  "model_checksum": "2bada8a7450677000f678be90653b85d364de7db25eb5ea54136ada5f3933730",
+  "tokenizer_revision": "embedded-in-gguf-layer-sha256:2bada8a7450677000f678be90653b85d364de7db25eb5ea54136ada5f3933730",
+  "backend_name": "ollama",
+  "backend_version": "0.12.6",
+  "container_id": null,
+  "cuda_gpu": "Quadro RTX 8000",
+  "dtype_quantization": "GGUF Q4_K_M (4-bit)",
+  "context_length": 32768,
+  "chat_template_id": "ollama-template-layer-sha256:eb4402837c7829a690fa845de4d7f3fd842c2adee476d5341da8a46ea9255175",
+  "json_parameters": {
+    "options": {
+      "num_ctx": 32768,
+      "seed": 0
+    }
+  },
+  "maximum_output_tokens": 4096,
+  "stop_sequences": [],
+  "seed": 0,
+  "batching": "serial-one-request-at-a-time-no-cross-session-batching",
+  "request_order": [
+    "T",
+    "M"
+  ],
+  "timeout_seconds": 600,
+  "retry_policy": "maximum-2-transient-retries-identical-request-no-decoding-fallback",
+  "temperature": 0,
+  "json_mode": true
+}

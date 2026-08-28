@@ -1,0 +1,288 @@
+manifest_version: 1.1.0
+runtime_downloads_allowed: false
+# This project is self-contained. It has NO runtime dependency on any other checkout.
+# Pretrained weights are not vendored: each component below declares how to obtain it
+# and the sha256 to verify it against. Run `python scripts/setup/fetch_models.py` to
+# stage everything into models/ , then `--verify` to check hashes before a run.
+#
+# sha256 values are the exact bytes used by the authorized environment on 2026-08-13.
+# They are verification targets, not provenance claims about an upstream release tag.
+# Fields marked capture_at_run have no evidenced value yet and must never be guessed.
+provenance:
+  recorded_on: "2026-08-14"
+  # Measured directly from the deployment after the successful offline GPU stage-1
+  # smoke run. The per-run manifest records the environment again at run time and is
+  # authoritative for any produced result.
+  runtime:
+    python: "3.10.12"
+    torch: "2.5.1+cu121"
+    torchvision: "0.20.1+cu121"
+    torchaudio: "2.5.1+cu121"
+    nvidia_cudnn_cu12: "9.1.1.17"
+    triton: "3.1.0"
+    onnxruntime: "1.23.2"
+    opencv_python_headless: "5.0.0.93"
+    transformers: "4.57.6"
+    huggingface_hub: "0.36.0"
+    ultralytics: "8.4.8"
+    whisperx: "3.7.4"
+    faster_whisper: "1.2.1"
+    ctranslate2: "4.6.3"
+    av: "15.1.0"
+    numpy: "2.0.2"
+    pandas: "2.2.3"
+    pyannote_audio: "3.4.0"
+    speechbrain: "1.0.3"
+    easyocr: "1.7.2"
+components:
+  - component_id: yolov8
+    role: person_detection_tracking
+    version: "ultralytics 8.4.8"
+    source:
+      type: ultralytics_auto
+      repository: https://github.com/ultralytics/ultralytics
+      model: yolov8n.pt
+      instruction: >-
+        Ultralytics resolves and caches `yolov8n.pt` on first use. Fetch once, then move
+        it to install_path and verify the hash. The exact upstream release tag backing
+        these bytes is capture_at_run; the sha256 is what pins reproducibility here.
+    install_path: models/yolov8n.pt
+    sha256: f59b3d833e2ff32e194b5bb8e08d211dc7c5bdf144b90d2c8412c47ccfc83b36
+    bytes: 6549796
+    license: AGPL-3.0
+    notes: >-
+      scripts/person_tracking/track_persons.py:43 takes the checkpoint as a parameter,
+      so this is configuration rather than a hardcoded default.
+  - component_id: yolov8_seg
+    role: native_cadence_person_segmentation_tracking
+    version: "ultralytics 8.4.8"
+    source:
+      type: ultralytics_auto
+      repository: https://github.com/ultralytics/ultralytics
+      model: yolov8s-seg.pt
+      instruction: >-
+        With ultralytics 8.4.8 installed in the explicit setup environment, fetch
+        `yolov8s-seg.pt` once through Ultralytics' documented checkpoint resolver,
+        move the resulting bytes to install_path, and verify this recorded digest.
+    install_path: models/yolov8s-seg.pt
+    sha256: 0bac0770b55e5eb5b76a61bc535673288dcec36c2bc0cd25ee0d584c632f3413
+    bytes: 23914764
+    license: AGPL-3.0
+    status: wired
+    notes: >-
+      Used person-class-only at native decoded cadence. BoT-SORT policy is pinned in
+      scripts/person_tracking/botsort_identity_stack.yaml; its thresholds are
+      unvalidated defaults pending calibration.
+  - component_id: osnet_x0_25_msmt17
+    role: person_appearance_reidentification
+    version: "osnet_x0_25 trained on MSMT17; ONNX export revision capture_at_run"
+    source:
+      type: manual_onnx_export
+      repository: https://github.com/KaiyangZhou/deep-person-reid
+      revision: capture_at_run
+      instruction: >-
+        Obtain the documented Torchreid osnet_x0_25 MSMT17 checkpoint and run
+        scripts/setup/export_osnet.py, which emits a fixed-shape float32 graph with input
+        NCHW 1x3x256x128. A re-export will not necessarily be byte-identical to the
+        recorded graph, so measure and record its digest rather than claiming it matches.
+        The upstream checkpoint provenance for the evaluated export is capture_at_run and
+        must not be invented.
+    install_path: models/osnet_x0_25_msmt17.onnx
+    sha256: 274f47794c20dd59f2ce3c05857d348588d1bd9c1ff847bd6c2ccd73d0a204f9
+    bytes: 891414
+    license: capture_at_run
+    status: not_yet_staged
+    notes: >-
+      The checked execution environment currently contains a graph matching the recorded
+      SHA-256. A public source-only clone does not redistribute those model bytes.
+  - component_id: whisperx
+    role: automatic_speech_recognition
+    version: "whisperx 3.7.4 / faster-whisper 1.2.1"
+    source:
+      type: huggingface
+      repo_id: Systran/faster-whisper-large-v2
+      revision: f0fe81560cb8b68660e564f55dd99207059c092e
+      instruction: >-
+        huggingface-cli download Systran/faster-whisper-large-v2
+        --revision f0fe81560cb8b68660e564f55dd99207059c092e
+    install_path: models/faster-whisper-large-v2
+    sha256: not_applicable_multi_file_snapshot
+    license: "BSD-4-Clause (whisperX), MIT (faster-whisper)"
+    notes: Pinned by snapshot revision rather than a single-file hash.
+  - component_id: whisperx_alignment_en
+    role: english_forced_alignment
+    version: "torchaudio 2.5.1 / WAV2VEC2_ASR_BASE_960H"
+    source:
+      type: torchaudio_bundle
+      bundle: WAV2VEC2_ASR_BASE_960H
+      artifact: wav2vec2_fairseq_base_ls960_asr_ls960.pth
+      instruction: >-
+        This exact torchaudio bundle checkpoint is already present on the authorized
+        host. Set TORCH_HOME explicitly, keep the file under
+        $TORCH_HOME/hub/checkpoints, and pass both the bundle name and concrete file to
+        the adapter. Runtime loading is offline and may not select a default bundle.
+    install_path: $TORCH_HOME/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
+    sha256: 488fd4f16de84438ffc945334278c1b9fb9b7159a806c1080b16111a958c945d
+    bytes: 377664473
+    license: capture_at_run
+    status: staged_hash_measured
+    notes: >-
+      SHA-256 and byte count were measured directly from
+      ~/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
+      on 2026-08-14. WhisperX records resolved_type=torchaudio in its output.
+  - component_id: pyannote_speaker_diarization_3_1
+    role: speaker_diarization
+    version: "pyannote/speaker-diarization-3.1; cached revisions capture_at_run"
+    source:
+      type: prepopulated_huggingface_cache
+      repo_id: pyannote/speaker-diarization-3.1
+      revision: capture_at_run
+      cached_repositories:
+        - pyannote/speaker-diarization-3.1
+        - pyannote/segmentation-3.0
+        - pyannote/wespeaker-voxceleb-resnet34-LM
+      instruction: >-
+        The complete gated stack is already cached on the authorized host. Set
+        PYANNOTE_CACHE to that cache root and pass the pipeline repo ID separately;
+        pyannote Pipeline.from_pretrained resolves config.yaml and its dependent models
+        from this cache while HF_HUB_OFFLINE=1 blocks network access.
+    install_path: $PYANNOTE_CACHE
+    sha256: capture_at_run
+    license: capture_at_run
+    status: staged_on_authorized_host_hash_not_captured
+    notes: >-
+      The authorized host contains cache repositories
+      models--pyannote--speaker-diarization-3.1,
+      models--pyannote--segmentation-3.0, and
+      models--pyannote--wespeaker-voxceleb-resnet34-LM under
+      ~/.cache/torch/pyannote. No concrete files from that host are available in this
+      checkout to measure, so the digest and revisions remain capture_at_run and
+      scripts/setup/fetch_models.py --verify must block until they are captured.
+  - component_id: light_asd
+    role: active_speaker_detection
+    version: capture_at_run
+    source:
+      type: git
+      repository: https://github.com/Junhua-Liao/Light-ASD
+      checkout_path: third_party/Light-ASD
+      revision: ed38c232de5efe0261dbd68627c0ade7cdfe14eb
+      instruction: >-
+        Clone the upstream repository into third_party/Light-ASD. Its pretrained
+        checkpoints ship in the repo under weight/. Verify against the hashes below.
+    install_path: third_party/Light-ASD/weight/finetuning_TalkSet.model
+    sha256: efc375833887eefa9d209dc92810e18519b04c3c73ea35a549f2a7f40b7d94d5
+    bytes: 4175289
+    license: capture_at_run
+    alternates:
+      - install_path: third_party/Light-ASD/weight/pretrain_AVA_CVPR.model
+        sha256: d44bc3ea7baa8e0946fa3921311714a630ed8b90a1928fab0dbe30d918909317
+        bytes: 4175289
+    notes: >-
+      Two checkpoints ship upstream. Which one the evaluated run loads is
+      capture_at_run and must be recorded in the run manifest.
+  - component_id: s3fd
+    role: light_asd_internal_face_front_end
+    version: "S3FD (Zhang et al., ICCV 2017)"
+    source:
+      type: git
+      repository: https://github.com/Junhua-Liao/Light-ASD
+      checkout_path: third_party/Light-ASD
+      revision: ed38c232de5efe0261dbd68627c0ade7cdfe14eb
+      instruction: >-
+        NOT bundled with the Light-ASD repository — verified by cloning it:
+        model/faceDetector/s3fd/ ships only Python (nets.py, box_utils.py, __init__.py)
+        and the README does not reference the checkpoint. sfd_face.pth must be obtained
+        separately and staged at install_path. The upstream source is capture_at_run and
+        must not be invented; the sha256 below is the exact file the evaluated
+        environment used and is the verification target.
+    install_path: third_party/Light-ASD/model/faceDetector/s3fd/sfd_face.pth
+    sha256: d54a87c2b7543b64729c9a25eafd188da15fd3f6e02f0ecec76ae1b30d86c491
+    bytes: 89844381
+    license: capture_at_run
+    notes: Invoked at conf_th=0.9 as Light-ASD's internal face front-end.
+  - component_id: 6drepnet360
+    role: head_pose
+    version: "6DRepNet360_Full-Rotation_300W_LP+Panoptic"
+    source:
+      type: url
+      repository: https://github.com/thohemp/6DRepNet360
+      url: https://cloud.ovgu.de/s/TewGC9TDLGgKkmS/download/6DRepNet360_Full-Rotation_300W_LP+Panoptic.pth
+      instruction: >-
+        Download once to install_path and verify the hash. MUST be staged before the
+        run — this project never downloads weights at runtime.
+    install_path: models/6DRepNet360_Full-Rotation_300W_LP+Panoptic.pth
+    sha256: 3ee08f1e04b8d452a6c4a40926a6f38051894ae6d0aaa6d191fe6d8bc6e4f9c6
+    bytes: 94397849
+    license: capture_at_run
+    notes: >-
+      This checkpoint is staged and verified before execution so a run never depends on
+      an external host.
+  - component_id: clip
+    role: scene_and_urgency
+    version: openai/clip-vit-base-patch32
+    source:
+      type: huggingface
+      repo_id: openai/clip-vit-base-patch32
+      revision: 3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268
+      instruction: >-
+        huggingface-cli download openai/clip-vit-base-patch32
+        --revision 3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268
+    install_path: models/clip-vit-base-patch32
+    sha256: not_applicable_multi_file_snapshot
+    license: MIT
+  - component_id: easyocr
+    role: monitor_ocr
+    version: "easyocr 1.7.2"
+    source:
+      type: easyocr_auto
+      repository: https://github.com/JaidedAI/EasyOCR
+      instruction: >-
+        EasyOCR fetches its detector/recognizer weights into its configured model cache
+        on first use. Stage them into install_path and record hashes before the evaluated
+        run; exact upstream URLs are capture_at_run and must not be invented.
+    install_path: models/easyocr
+    sha256: 93905bf3635d17b5789606c91e6a80ccb658ca6b190cdd2eb184ef4384a9085e
+    artifacts:
+      - path: craft_mlt_25k.pth
+        sha256: 4a5efbfb48b4081100544e75e1e2b57f8de3d84f213004b14b85fd4b3748db17
+        bytes: 83152330
+      - path: english_g2.pth
+        sha256: e2272681d9d67a04e2dff396b6e95077bc19001f8f6d3593c307b9852e1c29e8
+        bytes: 15143997
+    license: Apache-2.0
+    status: staged_hash_verified
+    notes: >-
+      This project requires an explicit monitor OCR config (schema_version, rois,
+      thresholds) and raises without one, rather than hardcoding ROI pixel coordinates
+      for a single monitor layout.
+  - component_id: qwen2_5_7b_instruct_ollama
+    role: focal_model
+    version: "Ollama 0.12.6, tag qwen2.5:7b, Q4_K_M 4-bit GGUF V3"
+    source:
+      type: ollama
+      repository: https://ollama.com/library/qwen2.5
+      model: qwen2.5:7b
+      instruction: "ollama pull qwen2.5:7b"
+    install_path: "$OLLAMA_MODELS (set per deployment; no path is baked in)"
+    sha256: 2bada8a7450677000f678be90653b85d364de7db25eb5ea54136ada5f3933730
+    manifest_config_digest: sha256:2f15b3218f0552c60647ce60ada83632d2c09755b16259b13e3e4458e9ae419d
+    model_layer_digest: sha256:2bada8a7450677000f678be90653b85d364de7db25eb5ea54136ada5f3933730
+    license: Apache-2.0
+    notes: >-
+      Decoding is temperature 0, JSON output mode, OLLAMA_CONTEXT_LENGTH=32768. Local
+      deployment is required because recordings contain identifiable data under
+      institutional governance.
+  - component_id: role_classifier
+    role: speaker_role_labelling
+    version: capture_at_run
+    source:
+      type: local_training
+      instruction: >-
+        Train with scripts/role_classification/train_classifier.py using authorized role
+        labels. The resulting weights are derived from governed training data and remain
+        in the authorized environment.
+    install_path: models/role_classifier.pkl
+    sha256: 5fdf04c7b0ba378a4a25f2cbbbe04a84587913667753f00f452b1fed59068b84
+    bytes: 125172
+    license: not_redistributed
+    status: locally_trained_not_redistributed

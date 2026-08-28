@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinical-harness.local/scripts/gaze/patient_zone_calibration.schema.json",
+  "title": "Per-session, per-camera mannequin calibration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "coordinate_system", "sessions"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "coordinate_system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["box_format", "origin", "range"],
+      "properties": {
+        "box_format": {"const": "normalized_xyxy"},
+        "origin": {"const": "top-left"},
+        "range": {
+          "type": "array",
+          "prefixItems": [{"const": 0}, {"const": 1}],
+          "items": false
+        }
+      }
+    },
+    "sessions": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^cam[1-9][0-9]*$": {"$ref": "#/$defs/calibration"}
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "patient_bbox_normalized",
+        "reference_frame",
+        "annotator",
+        "source_annotation"
+      ],
+      "properties": {
+        "patient_bbox_normalized": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"type": "number", "minimum": 0, "maximum": 1}
+        },
+        "reference_frame": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["frame_index", "timestamp_seconds"],
+          "properties": {
+            "frame_index": {"type": ["integer", "null"], "minimum": 0},
+            "timestamp_seconds": {"type": ["number", "null"], "minimum": 0}
+          }
+        },
+        "annotator": {"type": "string", "minLength": 1},
+        "source_annotation": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

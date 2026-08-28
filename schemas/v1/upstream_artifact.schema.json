@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinical-harness.local/schemas/v1/upstream_artifact.schema.json",
+  "title": "Canonical upstream extractor artifact",
+  "x-definition-ids": ["CONTRACT-01-TIME", "CONTRACT-02-IDENTITY", "CONTRACT-10-EVIDENCE"],
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "session_id", "artifact_id", "extractor", "status", "records", "provenance"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "session_id": {"$ref": "#/$defs/id"},
+    "artifact_id": {"$ref": "#/$defs/id"},
+    "extractor": {"enum": ["yolov8", "whisperx", "light_asd", "6drepnet360", "clip_scene", "easyocr"]},
+    "status": {"enum": ["success_nonempty", "success_empty", "unavailable", "failed"]},
+    "failure_reason": {"type": ["string", "null"]},
+    "records": {"type": "array", "items": {"$ref": "#/$defs/record"}},
+    "provenance": {"$ref": "#/$defs/provenance"}
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"const": "success_nonempty"}}}, "then": {"properties": {"records": {"minItems": 1}}}},
+    {"if": {"properties": {"status": {"const": "success_empty"}}}, "then": {"properties": {"records": {"maxItems": 0}}}},
+    {"if": {"properties": {"status": {"enum": ["unavailable", "failed"]}}}, "then": {"required": ["failure_reason"], "properties": {"records": {"maxItems": 0}, "failure_reason": {"type": "string", "minLength": 1}}}}
+  ],
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "record": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["evidence_id", "stream_id", "native_index", "native_timestamp_seconds", "aligned_timestamp_seconds", "sync_transform_id"],
+      "properties": {
+        "evidence_id": {"$ref": "#/$defs/id"},
+        "stream_id": {"$ref": "#/$defs/id"},
+        "native_index": {"type": "integer", "minimum": 0},
+        "native_timestamp_seconds": {"type": "number", "minimum": 0},
+        "aligned_timestamp_seconds": {"type": "number", "minimum": 0},
+        "sync_transform_id": {"$ref": "#/$defs/id"},
+        "camera_id": {"$ref": "#/$defs/id"},
+        "upstream_track_id": {"$ref": "#/$defs/id"},
+        "track_id": {"type": "string", "pattern": "^track:[A-Za-z0-9][A-Za-z0-9_.-]*:[A-Za-z0-9][A-Za-z0-9_.-]*$"},
+        "speaker_id": {"$ref": "#/$defs/id"},
+        "transcript_segment_id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component_id", "component_version", "config_sha256", "artifact_sha256", "source_stream_id"],
+      "properties": {
+        "component_id": {"$ref": "#/$defs/id"},
+        "component_version": {"$ref": "#/$defs/id"},
+        "config_sha256": {"$ref": "#/$defs/sha256"},
+        "artifact_sha256": {"$ref": "#/$defs/sha256"},
+        "source_stream_id": {"$ref": "#/$defs/id"}
+      }
+    }
+  }
+}

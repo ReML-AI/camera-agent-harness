@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinical-harness.local/schemas/v1/flag_artifact.schema.json",
+  "title": "Independent flag producer/fusion artifact",
+  "x-definition-ids": ["CONTRACT-07-FLAGS"],
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "session_id", "source", "status", "failure_reason", "flags", "provenance"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"}, "session_id": {"type": "string", "minLength": 1},
+    "source": {"enum": ["clip_urgency", "vitals_threshold", "transcript_keyword", "fused"]},
+    "status": {"enum": ["success_nonempty", "success_empty", "unavailable", "failed"]},
+    "failure_reason": {"type": ["string", "null"]},
+    "flags": {"type": "array", "items": {"$ref": "#/$defs/flag"}},
+    "source_statuses": {
+      "type": "object", "additionalProperties": false,
+      "required": ["clip_urgency", "vitals_threshold", "transcript_keyword"],
+      "properties": {
+        "clip_urgency": {"$ref": "#/$defs/status"}, "vitals_threshold": {"$ref": "#/$defs/status"},
+        "transcript_keyword": {"$ref": "#/$defs/status"}
+      }
+    },
+    "provenance": {"type": "object"}
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"const": "success_nonempty"}}}, "then": {"properties": {"flags": {"minItems": 1}, "failure_reason": {"type": "null"}}}},
+    {"if": {"properties": {"status": {"const": "success_empty"}}}, "then": {"properties": {"flags": {"maxItems": 0}, "failure_reason": {"type": "null"}}}},
+    {"if": {"properties": {"status": {"enum": ["unavailable", "failed"]}}}, "then": {"properties": {"flags": {"maxItems": 0}, "failure_reason": {"type": "string", "minLength": 1}}}}
+  ],
+  "$defs": {
+    "status": {"enum": ["success_nonempty", "success_empty", "unavailable", "failed"]},
+    "flag": {
+      "type": "object", "additionalProperties": true,
+      "required": ["flag_id", "start_seconds", "end_seconds"],
+      "properties": {
+        "flag_id": {"type": "string", "minLength": 1}, "start_seconds": {"type": "number", "minimum": 0},
+        "end_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "source": {"enum": ["clip_urgency", "vitals_threshold", "transcript_keyword"]},
+        "evidence_ids": {"type": "array", "items": {"type": "string"}},
+        "policy_id": {"type": "string"}, "payload": {"type": "object"},
+        "contribution_ids": {"type": "array", "items": {"type": "string"}},
+        "contributions": {"type": "array", "items": {"type": "object"}}
+      }
+    }
+  }
+}

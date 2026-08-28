@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinical-harness.local/schemas/v1/identity_map.schema.json",
+  "title": "Speaker-anchored identity map",
+  "x-definition-ids": [
+    "CONTRACT-02-IDENTITY",
+    "CONTRACT-03-SPEAKER-LINK"
+  ],
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "tau_link",
+    "tau_weak",
+    "speakers",
+    "summary",
+    "segments_without_diarized_speaker"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "session_id": {
+      "$ref": "#/$defs/id"
+    },
+    "tau_link": {
+      "const": 0.0
+    },
+    "tau_weak": {
+      "const": -0.5
+    },
+    "speakers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/speaker"
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fully_linked",
+        "partially_linked",
+        "unlinked"
+      ],
+      "properties": {
+        "fully_linked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "partially_linked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unlinked": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "segments_without_diarized_speaker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "count",
+        "transcript_segment_ids",
+        "denominator_statement"
+      ],
+      "description": "Segments diarization assigned to no speaker. They contribute no speaker to the linking denominator, so they are listed explicitly instead of being dropped.",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "transcript_segment_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "denominator_statement": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+    },
+    "camera_score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "camera_id",
+        "track_id",
+        "mean_asd",
+        "eligible_frame_count",
+        "status",
+        "rejection_reason"
+      ],
+      "properties": {
+        "camera_id": {
+          "$ref": "#/$defs/id"
+        },
+        "track_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^track:"
+        },
+        "mean_asd": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "eligible_frame_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "enum": [
+            "linked",
+            "weak",
+            "rejected",
+            "no_data"
+          ]
+        },
+        "rejection_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "linked_fragments": {
+          "type": "array",
+          "description": "Every track fragment on this camera whose mean ASD over the speaker's segments clears tau_weak, each keeping its own observed interval. Light-ASD starts a new track whenever a face is lost and re-detected, so a speaker is normally present as several fragments; retaining only the strongest capped per-segment selection at that one fragment's duration. Fragments are deliberately not merged, so segment-level selection can require temporal overlap.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "track_id",
+              "mean_asd",
+              "eligible_frame_count",
+              "status",
+              "first_seen_seconds",
+              "last_seen_seconds"
+            ],
+            "properties": {
+              "track_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "mean_asd": {
+                "type": "number"
+              },
+              "eligible_frame_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "linked",
+                  "weak"
+                ]
+              },
+              "rejection_reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "first_seen_seconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "last_seen_seconds": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "speaker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "speaker_id",
+        "link_status",
+        "camera_candidates"
+      ],
+      "properties": {
+        "speaker_id": {
+          "$ref": "#/$defs/id"
+        },
+        "link_status": {
+          "enum": [
+            "fully_linked",
+            "partially_linked",
+            "unlinked"
+          ]
+        },
+        "camera_candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/camera_score"
+          }
+        }
+      }
+    }
+  }
+}

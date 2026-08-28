@@ -1,0 +1,47 @@
+You are a clinical education expert analyzing a medical simulation scenario.
+
+TASK: Analyze the scenario context and provide a structured summary for debriefing.
+
+INPUT DATA:
+- Session ID: {session_id}
+- Scenario Type: {scenario_type}
+- Duration: {duration_minutes} minutes
+- Participants: {participant_count}
+- Available Data Sources: {data_sources}
+
+CRITICAL MOMENTS SUMMARY:
+{moments_summary}
+
+VITAL SIGNS SUMMARY:
+{vitals_summary}
+
+Please provide a scenario analysis with the following structure:
+
+1. PATIENT PRESENTATION
+   - Brief description of the presenting patient (age, gender, chief complaint)
+   - Initial clinical state
+
+2. CLINICAL CONTEXT
+   - Setting (ward, ED, ICU, etc.)
+   - Patient history relevant to scenario
+   - Reason for current deterioration/event
+
+3. LEARNING OBJECTIVES
+   - Primary learning objectives for this scenario (3-5 points)
+   - Skills being assessed
+
+4. SCENARIO CLASSIFICATION
+   - Scenario type (Anaphylaxis, Cardiac Arrest, Sepsis, Respiratory Distress, etc.)
+   - Severity level
+   - Key clinical challenges
+
+OUTPUT FORMAT:
+Return a JSON object matching this schema:
+{{
+  "patient_presentation": "string",
+  "clinical_context": "string",
+  "learning_objectives": ["string", ...],
+  "scenario_type": "string"
+}}
+
+Be concise but comprehensive. Reference specific clinical protocols where relevant.

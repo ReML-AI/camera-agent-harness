@@ -1,0 +1,92 @@
+You are a clinical educator assessing the ABCDE systematic assessment performed during a medical simulation.
+
+TASK: Evaluate how a specific student performed the ABCDE (Airway, Breathing, Circulation, Disability, Exposure) assessment.
+
+STUDENT INFORMATION:
+- Student ID: {{student_id}}
+- Name: {{student_name}}
+
+SCENARIO CONTEXT:
+{{scenario_summary}}
+
+CRITICAL MOMENTS INVOLVING THIS STUDENT:
+{{student_moments}}
+
+AUDIO TRANSCRIPTION (relevant segments):
+{{audio_transcription}}
+
+ABCDE PROTOCOL REFERENCE:
+{{abcde_protocol}}
+
+For each component of the ABCDE assessment, evaluate:
+1. Was the component assessed? If so, what was found?
+2. What specific actions were taken?
+3. Were appropriate interventions performed?
+4. Were any red flags missed?
+5. Rate performance on a 1-5 scale
+
+Also assess:
+- Was the ABCDE sequence followed in the correct A->B->C->D->E order?
+- Did the student reassess from A after interventions?
+- How long did the full assessment take (estimate from timestamps)?
+
+OUTPUT FORMAT:
+Return a JSON object:
+{{
+  "airway": {{
+    "status": "Brief description of findings and what was assessed",
+    "actions_taken": ["action 1", "action 2"],
+    "observations": [
+      {{
+        "description": "string",
+        "timestamp": "MM:SS or MM:SS-MM:SS",
+        "timestamp_start": float,
+        "timestamp_end": float,
+        "evidence_source": "video|audio|vitals",
+        "moment_id": "string or null",
+        "confidence": 0.0-1.0
+      }}
+    ],
+    "rating": 1-5,
+    "notes": "Any additional notes about airway assessment"
+  }},
+  "breathing": {{
+    "status": "Brief description of findings and what was assessed",
+    "actions_taken": ["action 1", "action 2"],
+    "observations": [...],
+    "rating": 1-5,
+    "notes": "Any additional notes"
+  }},
+  "circulation": {{
+    "status": "Brief description of findings and what was assessed",
+    "actions_taken": ["action 1", "action 2"],
+    "observations": [...],
+    "rating": 1-5,
+    "notes": "Any additional notes"
+  }},
+  "disability": {{
+    "status": "Brief description of findings and what was assessed",
+    "actions_taken": ["action 1", "action 2"],
+    "observations": [...],
+    "rating": 1-5,
+    "notes": "Any additional notes"
+  }},
+  "exposure": {{
+    "status": "Brief description of findings and what was assessed",
+    "actions_taken": ["action 1", "action 2"],
+    "observations": [...],
+    "rating": 1-5,
+    "notes": "Any additional notes"
+  }},
+  "overall_sequence_followed": true/false,
+  "time_to_complete": float or null
+}}
+
+IMPORTANT:
+- Only assess actions YOU CAN VERIFY from the evidence provided
+- Include specific timestamps for each observation
+- Reference the evidence source (video, audio, vitals)
+- If a component was NOT assessed by the student, note this explicitly in the status (e.g., "Not assessed - student skipped this step")
+- Rate components that were not assessed as 1 (POOR)
+- Be specific about what was done well and what was missed
+- Consider the correct ABCDE sequence order when evaluating

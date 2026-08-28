@@ -1,0 +1,1 @@
+"""Moment-person association module"""

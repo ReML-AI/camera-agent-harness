@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinical-harness.local/schemas/v1/context_window.schema.json",
+  "title": "Exact five-field focal context envelope",
+  "x-definition-ids": ["CONTRACT-05-VISUAL", "CONTRACT-06-CONTEXT", "CONTRACT-10-EVIDENCE"],
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "window_id", "session_id", "start_seconds", "end_seconds", "flag_ids", "context", "provenance"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "window_id": {"$ref": "#/$defs/id"}, "session_id": {"$ref": "#/$defs/id"},
+    "start_seconds": {"type": "number", "minimum": 0}, "end_seconds": {"type": "number", "exclusiveMinimum": 0},
+    "flag_ids": {"type": "array", "items": {"$ref": "#/$defs/id"}},
+    "context": {
+      "type": "object", "additionalProperties": false,
+      "required": ["transcript", "speaker_dynamics", "visual_scene", "visual_attention", "modality_coverage"],
+      "properties": {
+        "transcript": {"type": "array"}, "speaker_dynamics": {"type": ["object", "null"]},
+        "visual_scene": {"type": ["object", "null"]},
+        "visual_attention": {
+          "type": ["object", "null"], "additionalProperties": false,
+          "required": ["labels", "distribution", "records", "events"],
+          "properties": {
+            "labels": {"const": ["patient", "person", "other"]},
+            "distribution": {
+              "type": "object", "additionalProperties": false,
+              "required": ["patient", "person", "other"],
+              "properties": {
+                "patient": {"type": "number", "minimum": 0, "maximum": 1},
+                "person": {"type": "number", "minimum": 0, "maximum": 1},
+                "other": {"type": "number", "minimum": 0, "maximum": 1}
+              }
+            },
+            "records": {"type": "array", "items": {"$ref": "#/$defs/attention_record"}},
+            "events": {"type": "array", "items": {"$ref": "#/$defs/attention_event"}}
+          }
+        },
+        "modality_coverage": {
+          "type": "object", "additionalProperties": false,
+          "required": ["evidence_id", "transcript", "speaker_dynamics", "visual_scene", "visual_attention"],
+          "properties": {
+            "evidence_id": {"$ref": "#/$defs/id"},
+            "transcript": {"$ref": "#/$defs/coverage"}, "speaker_dynamics": {"$ref": "#/$defs/coverage"},
+            "visual_scene": {"$ref": "#/$defs/coverage"}, "visual_attention": {"$ref": "#/$defs/coverage"}
+          }
+        }
+      }
+    },
+    "provenance": {"type": "object"}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"},
+    "coverage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["present", "delivered", "evidence_ids"],
+      "properties": {
+        "present": {"type": "boolean"}, "delivered": {"type": "boolean"},
+        "evidence_ids": {"type": "array", "items": {"$ref": "#/$defs/id"}}
+      }
+    },
+    "attention_record": {
+      "type": "object", "additionalProperties": true, "required": ["label"],
+      "properties": {
+        "label": {"enum": ["patient", "person", "other"]},
+        "raw_label": {"enum": ["patient", "person", "other"]}
+      }
+    },
+    "attention_event": {
+      "type": "object", "additionalProperties": true,
+      "not": {"required": ["type"], "properties": {"type": {"const": "monitor_check"}}},
+      "properties": {
+        "label": {"enum": ["patient", "person", "other"]},
+        "raw_label": {"enum": ["patient", "person", "other"]},
+        "target": {"enum": ["patient", "person", "other"]},
+        "from_target": {"enum": ["patient", "person", "other"]},
+        "to_target": {"enum": ["patient", "person", "other"]}
+      }
+    }
+  }
+}

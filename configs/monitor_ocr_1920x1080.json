@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0.0",
+  "_provenance": {
+    "authored_from": "session_008 monitor.mp4 frame at t=600s, 1920x1080",
+    "annotator": "lead",
+    "note": "ROIs are (x, y, width, height) in pixels for a 1920x1080 monitor capture. They are specific to this monitor layout and must be re-authored for a different screen or resolution; the extractor deliberately refuses to run without an explicit config rather than assuming coordinates.",
+    "roi_correction": "spo2/resp_rate/nbp_sys/nbp_dia re-measured from session_001 monitor.mp4 at t=300s and validated by running easyOCR against the values legible in that frame"
+  },
+  "rois": {
+    "alert_banner": [
+      385,
+      52,
+      1535,
+      48
+    ],
+    "hr": [
+      1390,
+      140,
+      320,
+      160
+    ],
+    "spo2": [
+      1395,
+      565,
+      200,
+      130
+    ],
+    "nbp_mean": [
+      125,
+      815,
+      140,
+      65
+    ],
+    "pulse": [
+      1055,
+      775,
+      240,
+      115
+    ],
+    "resp_rate": [
+      1395,
+      760,
+      200,
+      140
+    ],
+    "temp": [
+      1710,
+      770,
+      205,
+      125
+    ],
+    "nbp_sys": [
+      100,
+      748,
+      92,
+      72
+    ],
+    "nbp_dia": [
+      214,
+      748,
+      88,
+      72
+    ]
+  },
+  "thresholds": {
+    "hr": {
+      "low": 50,
+      "high": 120,
+      "critical_low": 40,
+      "critical_high": 150
+    },
+    "spo2": {
+      "low": 92,
+      "high": 100,
+      "critical_low": 88,
+      "critical_high": 100
+    },
+    "pulse": {
+      "low": 50,
+      "high": 120,
+      "critical_low": 40,
+      "critical_high": 150
+    },
+    "resp_rate": {
+      "low": 10,
+      "high": 24,
+      "critical_low": 8,
+      "critical_high": 30
+    },
+    "temp": {
+      "low": 35.5,
+      "high": 38.0,
+      "critical_low": 35.0,
+      "critical_high": 39.0
+    },
+    "nbp_sys": {
+      "low": 90,
+      "high": 160,
+      "critical_low": 80,
+      "critical_high": 180
+    },
+    "nbp_dia": {
+      "low": 50,
+      "high": 95,
+      "critical_low": 40,
+      "critical_high": 110
+    }
+  }
+}

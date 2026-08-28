@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "The exact ordered five semantic fields delivered per selected 30-second window. Windows tile the session without overlap.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "transcript",
+    "speaker_dynamics",
+    "visual_scene",
+    "visual_attention",
+    "modality_coverage"
+  ],
+  "properties": {
+    "transcript": {
+      "type": "array"
+    },
+    "speaker_dynamics": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "visual_scene": {
+      "type": [
+        "object",
+        "null",
+        "string"
+      ]
+    },
+    "visual_attention": {
+      "type": [
+        "object",
+        "null",
+        "string"
+      ]
+    },
+    "modality_coverage": {
+      "type": "object"
+    }
+  }
+}

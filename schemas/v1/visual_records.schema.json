@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinical-harness.local/schemas/v1/visual_records.schema.json",
+  "title": "Calibrated attention record envelope",
+  "x-definition-ids": [
+    "CONTRACT-05-VISUAL",
+    "CONTRACT-10-EVIDENCE"
+  ],
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "attention"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attention": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/attention"
+      }
+    }
+  },
+  "$defs": {
+    "attention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_id",
+        "camera_id",
+        "track_id",
+        "aligned_timestamp_seconds",
+        "raw_label",
+        "label",
+        "calibration_version",
+        "assignment_procedure_id",
+        "smoothing_procedure_id",
+        "threshold_degrees",
+        "rolling_mode_window",
+        "exact_frame_gate"
+      ],
+      "properties": {
+        "evidence_id": {
+          "type": "string"
+        },
+        "camera_id": {
+          "type": "string"
+        },
+        "track_id": {
+          "type": "string"
+        },
+        "aligned_timestamp_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "yaw_degrees": {
+          "type": "number"
+        },
+        "raw_label": {
+          "enum": [
+            "patient",
+            "person",
+            "other"
+          ]
+        },
+        "label": {
+          "enum": [
+            "patient",
+            "person",
+            "other"
+          ]
+        },
+        "angular_distance_degrees": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 180
+        },
+        "target_track_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "calibration_version": {
+          "type": "string"
+        },
+        "calibration_session_id": {
+          "type": "string"
+        },
+        "calibration_camera_id": {
+          "type": "string"
+        },
+        "assignment_procedure_id": {
+          "type": "string"
+        },
+        "smoothing_procedure_id": {
+          "type": "string"
+        },
+        "threshold_degrees": {
+          "const": 35.0
+        },
+        "rolling_mode_window": {
+          "const": 5
+        },
+        "exact_frame_gate": {
+          "enum": [
+            "exact_frame_asd_positive",
+            "exact_frame_asd_not_positive",
+            "exact_frame_asd_missing"
+          ]
+        },
+        "exact_frame_asd_score": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "timestamp": {
+          "type": "number"
+        },
+        "gaze_target": {
+          "enum": [
+            "patient",
+            "person",
+            "other"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Frontend
+node_modules/
+frontend/dist/
+
+# Governed data, generated outputs, and local models
+data/
+artifacts/
+reconcile/
+models/
+*.pkl
+*.pickle
+*.db
+*.mp4
+!demo/media/*.mp4
+*.mp3
+*.wav
+*.avi
+*.zip
+
+# External source checkouts; retain only provenance and recorded patches
+third_party/*
+!third_party/manifest.yaml
+!third_party/patches/
+!third_party/patches/*.patch
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Deployment, scheduler, and logs
+DEPLOYED_COMMIT
+slurm-*.out
+*.log
+tmp/
+
+# Editors and operating-system files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Local agent/browser state
+.claude/
+.codex/
+.agents/
+.superpowers/
+.playwright-mcp/
+[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-*.png

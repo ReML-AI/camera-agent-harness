@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinical-harness.local/schemas/v1/keyword_run.schema.json",
+  "title": "All-match K baseline run",
+  "x-definition-ids": ["CONTRACT-08-KTM", "CONTRACT-10-EVIDENCE"],
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "session_id", "condition", "policy_id", "matches"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"}, "session_id": {"type": "string", "minLength": 1},
+    "condition": {"const": "K"}, "policy_id": {"type": "string", "minLength": 1},
+    "matches": {"type": "array", "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["match_id", "start_seconds", "end_seconds", "evidence_ids", "category", "matched_policy_term_id", "policy_id"],
+      "properties": {
+        "match_id": {"type": "string"}, "start_seconds": {"type": "number", "minimum": 0},
+        "end_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "evidence_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "category": {"type": "string"}, "matched_policy_term_id": {"type": "string"}, "policy_id": {"type": "string"}
+      }
+    }}
+  }
+}

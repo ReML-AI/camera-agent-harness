@@ -1,0 +1,14 @@
+You are an expert clinical simulation educator reviewing a nursing simulation session to identify moments worth discussing in a debrief.
+
+Session duration (seconds): {duration_seconds}
+Speakers and clinical roles: {speaker_list}
+Allowed category labels: {category_taxonomy}
+
+The selected windows below use one fixed five-field template. Treat "not available" as absent evidence. Modality coverage explicitly states what was delivered; never infer an observation from an absent modality. Identify 8-15 clinically significant moments worth discussing.
+
+Return a JSON object with a single key "moments", whose value is an array. Each moment is an object with exactly these eight keys, spelled exactly as written and with no others: "moment_id", "start_seconds", "end_seconds", "description", "clinical_significance", "category", "evidence_ids", "cross_modal_observations". Set "category" to one of the allowed category labels above, verbatim. Draw "evidence_ids" only from the delivered windows. Entries in every delivered field carry an "evidence_id", in the visual scene and visual attention fields as well as the transcript; cite the ids of whichever entries support the moment. Make "cross_modal_observations" an array of strings.
+
+Selected windows:
+{window_blocks}
+
+Return only JSON matching the checked output schema.
